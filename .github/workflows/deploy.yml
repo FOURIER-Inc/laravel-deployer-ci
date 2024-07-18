@@ -1,0 +1,50 @@
+name: deploy
+
+on: push
+
+concurrency: production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+
+    - name: Install Composer
+      run: composer install
+
+    - name: Deploy
+      uses: deployphp/action@v1
+      with:
+        dep: deploy
+        private-key: ${{ secrets.SERVER_PRIVATE_KEY }}
+        verbosity: -vvv
+        ssh-config: |
+          StrictHostKeyChecking no
+      env:
+        GITHUB_WORKSPACE: ${{ github.workspace}}
+        SERVER_NAME: ${{ secrets.SERVER_NAME }}
+        SERVER_PORT: ${{ secrets.SERVER_PORT }}
+        SERVER_USER: ${{ secrets.SERVER_USER }}
+        SERVER_PRIVATE_KEY: ${{ secrets.SERVER_PRIVATE_KEY }}
+        SERVER_PATH: ${{ secrets.SERVER_PATH }}
+        ENV_FILE: ${{ secrets.ENV_FILE }}
+        DB_CONNECTION: ${{ secrets.DB_CONNECTION }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_PORT: ${{ secrets.DB_PORT }}
+        DB_DATABASE: ${{ secrets.DB_DATABASE }}
+        DB_USERNAME: ${{ secrets.DB_USERNAME }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        MAIL_MAILER: ${{ secrets.MAIL_MAILER }}
+        MAIL_HOST: ${{ secrets.MAIL_HOST }}
+        MAIL_PORT: ${{ secrets.MAIL_PORT }}
+        MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+        MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
